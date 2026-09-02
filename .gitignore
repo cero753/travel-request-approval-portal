@@ -30,8 +30,15 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files — everything is ignored EXCEPT the committed template.
+# Do not add exceptions here without checking scripts/check-secrets.ts first.
 .env*
+!.env.example
+
+# Claude Code local state. settings.local.json records per-machine permission
+# grants, including defaultMode — personal configuration, not the project's.
+.claude/settings.local.json
+.claude/_trap_claude/
 
 # vercel
 .vercel
