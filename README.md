@@ -21,17 +21,14 @@ back into the portal automatically, with a complete audit trail.
 rules, CSV formula-injection, upload magic-byte sniffing), `tsc --noEmit` clean,
 production build clean, secret scan clean, all 12 migrations applied.
 
-**Partly verified:** the state machine itself *was* exercised against the live
-database — `submit_request`, `decide_request` (twice, plus the losing-decision
-audit row), `consume_approval_token` (single use, unknown token) and
-`expire_due_requests` (not-due, then due, then a late decision refused) were all
-run inside rolled-back `DO` blocks, leaving no residue. Those observed values are
-what `tests/integration/state-machine.test.ts` asserts.
+**Also verified:** 9 integration tests green against the live database —
+`decide_request` applying once and refusing the second, the losing decision's
+audit row, two genuinely concurrent decisions resolving to exactly one winner,
+single-use approval tokens, and expiry followed by a late reply being refused.
 
-**Not yet verified:** that test file has only ever been *collected* — all 9 tests
-skip, because they need `SUPABASE_SERVICE_ROLE_KEY`, which was not available at
-build time. No assertion in it has run. Paste the key in and run
-`npm run test:integration` before trusting it.
+**Still unverified:** live email. `EMAIL_PROVIDER=fake`; nothing has been sent
+through Resend. The reply parser is covered by 40 unit fixtures and the inbound
+webhook by the simulator, but no real message has traversed the path.
 
 Not deployed. Local only.
 

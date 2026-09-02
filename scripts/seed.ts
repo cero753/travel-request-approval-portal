@@ -8,7 +8,13 @@
  * bcrypt the password with the right cost, and get silently wrong in ways that
  * only surface as "invalid login credentials".
  */
-import 'dotenv/config';
+// `dotenv/config` reads .env only. Next.js puts local secrets in .env.local and
+// this project has no .env at all, so load that first — dotenv does not
+// overwrite an already-set variable, making the second call a plain fallback.
+import { config } from 'dotenv';
+config({ path: '.env.local' });
+config();
+
 import { createClient } from '@supabase/supabase-js';
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;

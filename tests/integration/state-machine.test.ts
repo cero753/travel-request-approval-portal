@@ -1,4 +1,8 @@
-import 'dotenv/config';
+// See scripts/seed.ts: secrets live in .env.local, which `dotenv/config` skips.
+import { config } from 'dotenv';
+config({ path: '.env.local' });
+config();
+
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { randomUUID, createHash } from 'node:crypto';
