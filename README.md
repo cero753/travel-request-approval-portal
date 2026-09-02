@@ -21,9 +21,17 @@ back into the portal automatically, with a complete audit trail.
 rules, CSV formula-injection, upload magic-byte sniffing), `tsc --noEmit` clean,
 production build clean, secret scan clean, all 12 migrations applied.
 
-**Not yet verified:** the integration suite in `tests/integration/` has never
-been executed — it needs `SUPABASE_SERVICE_ROLE_KEY`, which was not available at
-build time. Treat those tests as unproven until they go green.
+**Partly verified:** the state machine itself *was* exercised against the live
+database — `submit_request`, `decide_request` (twice, plus the losing-decision
+audit row), `consume_approval_token` (single use, unknown token) and
+`expire_due_requests` (not-due, then due, then a late decision refused) were all
+run inside rolled-back `DO` blocks, leaving no residue. Those observed values are
+what `tests/integration/state-machine.test.ts` asserts.
+
+**Not yet verified:** that test file has only ever been *collected* — all 9 tests
+skip, because they need `SUPABASE_SERVICE_ROLE_KEY`, which was not available at
+build time. No assertion in it has run. Paste the key in and run
+`npm run test:integration` before trusting it.
 
 Not deployed. Local only.
 
@@ -157,7 +165,7 @@ npm run typecheck        # next typegen && tsc --noEmit
 npm run lint
 npm test                 # everything
 npm run test:unit        # no database required
-npm run test:integration # needs SUPABASE_SERVICE_ROLE_KEY and a dev server
+npm run test:integration # needs SUPABASE_SERVICE_ROLE_KEY; skips without it
 npm run seed
 npm run check:secrets    # run before every push
 ```
@@ -172,6 +180,6 @@ src/lib/             env, supabase clients, tokens, csv, file-type, cities
 src/emails/          React Email templates
 supabase/migrations/ 0001-0012, applied in order
 tests/unit/          no database needed
-tests/integration/   real dev server, real HTTP, real database
+tests/integration/   real database, via the service client
 scripts/             seed.ts, check-secrets.ts
 ```
